@@ -1,12 +1,20 @@
 <resources>
     <string name="app_name">Frame</string>
     <string name="flip">Flip</string>
-    <string name="flash_off">Flash off</string>
-    <string name="flash_auto">Flash auto</string>
-    <string name="flash_on">Flash on</string>
+    <string name="tab_filter">Filter</string>
+    <string name="tab_reference">Reference</string>
+    <string name="upload_reference">Upload reference image</string>
+    <string name="opacity">Opacity</string>
+    <string name="adjust">Adjust</string>
+    <string name="mirror">Mirror</string>
+    <string name="replace">Replace</string>
+    <string name="remove">Remove</string>
+    <string name="adjust_hint">Drag to move, pinch to resize, double tap to reset</string>
     <string name="shutter">Take photo</string>
     <string name="last_photo">Open last photo</string>
-    <string name="need_permission">Frame needs camera access to work. Allow it in Settings, then reopen the app.</string>
+    <string name="need_permission">Frame needs camera access. Allow it in Settings, then reopen the app.</string>
     <string name="saved">Saved to Pictures/Frame</string>
     <string name="save_failed">Could not save the photo</string>
+    <string name="no_flash">This camera has no flash</string>
+    <string name="load_failed">Could not open that image</string>
 </resources>

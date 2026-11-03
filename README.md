@@ -1,13 +1,14 @@
 # Frame
 
-A small Android camera app (Kotlin, CameraX). Tap to focus, pinch to zoom,
-flash modes, front/back switch, photos saved to Pictures/Frame.
+Android camera app (Kotlin, CameraX) built around a reference overlay.
 
-## Get the APK without Android Studio
-1. Create a new GitHub repository and upload everything in this folder.
-2. Open the Actions tab, run "Build APK" (it also runs on every push).
-3. When it finishes, download the "Frame-debug-apk" artifact, unzip it.
-4. Copy app-debug.apk to your phone, open it, and allow "install unknown apps" when asked.
+- Upload a reference image and set its opacity so you can line your subject up with it.
+  Adjust moves and resizes the reference, Mirror flips it. The overlay is never saved into the photo.
+- Eight filters. The live preview shows the filter and the saved photo has it applied.
+- Flash (off, auto, on), timer (3s, 10s), grid (thirds, center), front and back camera.
+- Tap to focus, pinch to zoom, volume buttons take the photo.
+- Photos are saved to Pictures/Frame. Needs Android 10 or newer.
 
-## With Android Studio
-Open this folder, wait for the Gradle sync, plug in the phone with USB debugging on, press Run.
+## Build the APK
+Push this folder to GitHub. The Build APK action produces app-debug.apk under Actions > run > Artifacts.
+Or open the folder in Android Studio and press Run.

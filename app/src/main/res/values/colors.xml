@@ -1,6 +1,10 @@
 <resources>
-    <color name="ground">#16140F</color>
-    <color name="bone">#EDE7D8</color>
-    <color name="dim">#A39D8C</color>
-    <color name="ring">#D8C79A</color>
+    <color name="ground">#121110</color>
+    <color name="well">#0B0A09</color>
+    <color name="panel">#1A1917</color>
+    <color name="line">#4A463D</color>
+    <color name="bone">#E8E2D2</color>
+    <color name="dim">#8E8878</color>
+    <color name="brass">#C9A961</color>
+    <color name="scrim">#B3121110</color>
 </resources>
