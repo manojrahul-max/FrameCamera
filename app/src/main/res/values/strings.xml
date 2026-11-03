@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Frame</string>
+    <string name="flip">Flip</string>
+    <string name="flash_off">Flash off</string>
+    <string name="flash_auto">Flash auto</string>
+    <string name="flash_on">Flash on</string>
+    <string name="shutter">Take photo</string>
+    <string name="last_photo">Open last photo</string>
+    <string name="need_permission">Frame needs camera access to work. Allow it in Settings, then reopen the app.</string>
+    <string name="saved">Saved to Pictures/Frame</string>
+    <string name="save_failed">Could not save the photo</string>
+</resources>
