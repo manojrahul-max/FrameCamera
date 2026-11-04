@@ -11,8 +11,8 @@ android {
         applicationId = "app.frame.camera"
         minSdk = 29
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "2.0"
     }
 
     compileOptions {
@@ -32,4 +32,6 @@ dependencies {
     implementation("androidx.camera:camera-camera2:$camerax")
     implementation("androidx.camera:camera-lifecycle:$camerax")
     implementation("androidx.camera:camera-view:$camerax")
+    implementation("androidx.camera:camera-video:$camerax")
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
 }

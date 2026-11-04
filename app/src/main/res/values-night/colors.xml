@@ -1,0 +1,10 @@
+<resources>
+    <color name="bg">#0E0F11</color>
+    <color name="surface">#17181B</color>
+    <color name="ink">#ECE9E2</color>
+    <color name="ink_dim">#9A978E</color>
+    <color name="accent">#EDA94C</color>
+    <color name="glass_fill">#24FFFFFF</color>
+    <color name="glass_stroke">#2EFFFFFF</color>
+    <color name="nav_line">#26FFFFFF</color>
+</resources>

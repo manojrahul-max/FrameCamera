@@ -1,14 +1,11 @@
 # Frame
 
-Android camera app (Kotlin, CameraX) built around a reference overlay.
+Android camera app (Kotlin, CameraX). Stage 1 of the studio.
 
-- Upload a reference image and set its opacity so you can line your subject up with it.
-  Adjust moves and resizes the reference, Mirror flips it. The overlay is never saved into the photo.
-- Eight filters. The live preview shows the filter and the saved photo has it applied.
-- Flash (off, auto, on), timer (3s, 10s), grid (thirds, center), front and back camera.
-- Tap to focus, pinch to zoom, volume buttons take the photo.
-- Photos are saved to Pictures/Frame. Needs Android 10 or newer.
+Camera: photo and video, aspect ratios 4:3, 16:9, 1:1 and full, timer 3/5/10 s, burst,
+grids (thirds, square, golden, center), exposure, pinch zoom, tap to focus, flash and torch,
+video quality and frame rate, pause and resume, reference image overlay with opacity, photo filters.
 
-## Build the APK
-Push this folder to GitHub. The Build APK action produces app-debug.apk under Actions > run > Artifacts.
-Or open the folder in Android Studio and press Run.
+Gallery: photos and videos, grid and list, multi-select, favorites, share, delete, sort, full-screen viewer.
+
+Build: push to GitHub and run the Build APK action, or open in Android Studio.
