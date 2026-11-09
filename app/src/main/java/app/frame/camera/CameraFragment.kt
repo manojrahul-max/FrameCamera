@@ -67,6 +67,12 @@ import androidx.core.view.doOnLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import app.frame.camera.fx.EffectCatalog
+import app.frame.camera.fx.EffectDef
+import app.frame.camera.fx.EffectPanel
+import app.frame.camera.fx.EffectSettings
+import app.frame.camera.fx.FxEffect
+import app.frame.camera.fx.FxHub
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -113,6 +119,11 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     private lateinit var replaceButton: TextView
     private lateinit var removeButton: TextView
     private lateinit var chipFilters: TextView
+    private lateinit var zoomRow: LinearLayout
+    private lateinit var lookTabs: View
+    private lateinit var tabFilters: TextView
+    private lateinit var tabEffects: TextView
+    private lateinit var effectHost: FrameLayout
     private lateinit var chipReference: TextView
     private lateinit var modePhoto: TextView
     private lateinit var modeVideo: TextView
@@ -134,6 +145,9 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     private var zoomLive: LiveData<ZoomState>? = null
     private val zoomObserver = Observer<ZoomState> { z ->
         zoomText.text = String.format(Locale.US, "%.1fx", z.zoomRatio)
+        lastZoom = z.zoomRatio
+        updateZoomChips(z.zoomRatio)
+        checkLens(z.zoomRatio)
     }
     private var dotAnimator: ObjectAnimator? = null
 
@@ -153,6 +167,20 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     private var exposureLower = 0
     private var exposureStep = 0f
     private var lastUri: Uri? = null
+
+    // effects and compatibility
+    private lateinit var fxSettings: EffectSettings
+    private var fxList: List<EffectDef> = emptyList()
+    private var activeFx: EffectDef? = null
+    private var fxEffect: FxEffect? = null
+    private var effectPanel: EffectPanel? = null
+    private var compat: CompatMatrix? = null
+    private var currentLensId: String? = null
+    private var lastZoom = 1f
+    private var bindFailures = 0
+    private var snapGuard = 0
+    private var lookTab = 0
+    private val zoomChips = ArrayList<Pair<Float, TextView>>()
     private var lastIsVideo = false
 
     // reference overlay
@@ -260,12 +288,20 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             if (state == PreviewView.StreamState.STREAMING) applyLiveFilter()
         })
 
+        fxSettings = EffectSettings(requireContext())
+        fxList = EffectCatalog.all(requireContext())
+        activeFx = EffectCatalog.byId(requireContext(), fxSettings.activeId)
+        if (activeFx != null) savedFilter = 0
+        FxHub.acquire(requireContext())
+        buildEffectPanel()
+        lookTab = if (activeFx != null) 1 else 0
         buildFilterChips()
         setUpControls()
         setUpTouch()
         gridOverlay.mode = savedGrid
         updateTools()
         updateModeUi()
+        updateLooksUi()
         updateReferenceUi()
         loadSavedReference()
 
@@ -312,6 +348,11 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         replaceButton = v.findViewById(R.id.replaceButton)
         removeButton = v.findViewById(R.id.removeButton)
         chipFilters = v.findViewById(R.id.chipFilters)
+        zoomRow = v.findViewById(R.id.zoomRow)
+        lookTabs = v.findViewById(R.id.lookTabs)
+        tabFilters = v.findViewById(R.id.tabFilters)
+        tabEffects = v.findViewById(R.id.tabEffects)
+        effectHost = v.findViewById(R.id.effectHost)
         chipReference = v.findViewById(R.id.chipReference)
         modePhoto = v.findViewById(R.id.modePhoto)
         modeVideo = v.findViewById(R.id.modeVideo)
@@ -399,6 +440,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
         val video = savedMode == MODE_VIDEO
         val wide = video || savedAspect == 1 || savedAspect == 3
+        val def = activeFx
 
         val preview = Preview.Builder().setResolutionSelector(resolutionFor(wide)).build().also {
             it.setSurfaceProvider(previewView.surfaceProvider)
@@ -407,6 +449,17 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             .setScaleType(ViewPort.FILL_CENTER)
             .build()
         val group = UseCaseGroup.Builder().setViewPort(viewPort).addUseCase(preview)
+
+        // The effect is only created while one is active, so an inactive effect costs nothing.
+        var fx: FxEffect? = null
+        if (def != null) {
+            fx = FxEffect.create(requireContext(), video) { t ->
+                handler.post { onFxFailure(t.message) }
+            }
+            fx.processor.effect = def
+            fx.processor.params = fxSettings.snapshot(def)
+            group.addEffect(fx)
+        }
 
         if (video) {
             val recorder = Recorder.Builder()
@@ -432,40 +485,135 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         }
 
         cameraProvider.unbindAll()
+        fxEffect?.release()
+        fxEffect = null
         val cam = try {
             cameraProvider.bindToLifecycle(viewLifecycleOwner, selector, group.build())
         } catch (e: Exception) {
-            toast("This camera setting is not available on your phone")
+            fx?.release()
+            onBindFailed(def != null)
             return
         }
+        fxEffect = fx
         camera = cam
         torchOn = false
+        bindFailures = 0
 
-        if (video) {
-            supportedQualities = try {
-                QualitySelector.getSupportedQualities(cam.cameraInfo)
-                    .filter { it == Quality.UHD || it == Quality.FHD || it == Quality.HD || it == Quality.SD }
-            } catch (e: Exception) {
-                emptyList()
-            }
-            if (supportedQualities.isNotEmpty() && !supportedQualities.contains(savedQuality)) {
-                savedQuality = if (supportedQualities.contains(Quality.FHD)) Quality.FHD
-                else supportedQualities.first()
+        val cm = CompatMatrix(requireContext(), cam.cameraInfo, savedLens)
+        compat = cm
+        supportedQualities = cm.qualities
+        val zoomNow = cam.cameraInfo.zoomState.value?.zoomRatio ?: 1f
+        lastZoom = zoomNow
+        currentLensId = cm.lensAt(zoomNow).id
+
+        if (video && cm.qualities.isNotEmpty() && !cm.isSupported(zoomNow, def != null, savedQuality, savedFps)) {
+            val n = cm.nearest(zoomNow, def != null, savedQuality, savedFps)
+            if (n != null && snapGuard < 2) {
+                snapGuard++
+                val why = if (def != null) "Effects record up to 1080p 30" else "${cm.lensAt(zoomNow).name} lens"
+                savedQuality = n.quality
+                savedFps = n.fps
+                toast("$why: using ${n.label}")
                 bindCamera()
                 return
             }
         }
+        snapGuard = 0
 
         zoomLive?.removeObserver(zoomObserver)
         zoomLive = cam.cameraInfo.zoomState
         zoomLive?.observe(viewLifecycleOwner, zoomObserver)
 
+        buildZoomChips()
         setUpExposure(cam)
         if (!cam.cameraInfo.hasFlashUnit() && flashMode != ImageCapture.FLASH_MODE_OFF) {
             flashMode = ImageCapture.FLASH_MODE_OFF
         }
         applyLiveFilter()
         updateTools()
+    }
+
+    /** Recovers from a failed bind: first drop the effect, then fall back to a safe video setting. */
+    private fun onBindFailed(hadEffect: Boolean) {
+        bindFailures++
+        if (hadEffect && bindFailures <= 2) {
+            val name = activeFx?.name ?: "The effect"
+            disableFx()
+            toast("$name could not run with these camera settings, so it was turned off", true)
+            bindCamera()
+            return
+        }
+        if (savedMode == MODE_VIDEO && (savedQuality != Quality.FHD || savedFps != 30) && bindFailures <= 3) {
+            compat?.block(lastZoom, savedQuality, savedFps)
+            savedQuality = Quality.FHD
+            savedFps = 30
+            toast("That video setting is not available on this camera. Using 1080p 30", true)
+            bindCamera()
+            return
+        }
+        toast("This camera setting is not available on your phone")
+    }
+
+    // ------------------------------------------------------------ lens and zoom
+
+    private val lensRunnable = Runnable {
+        val cm = compat ?: return@Runnable
+        if (!isAdded || recording != null || savedMode != MODE_VIDEO) return@Runnable
+        if (!cm.isSupported(lastZoom, activeFx != null, savedQuality, savedFps)) {
+            val n = cm.nearest(lastZoom, activeFx != null, savedQuality, savedFps) ?: return@Runnable
+            savedQuality = n.quality
+            savedFps = n.fps
+            toast("${cm.lensAt(lastZoom).name} lens: using ${n.label}")
+            bindCamera()
+            updateTools()
+        }
+    }
+
+    /** A different physical lens takes over at this zoom. Re-check the chosen video setting against it. */
+    private fun checkLens(zoom: Float) {
+        val cm = compat ?: return
+        val id = cm.lensAt(zoom).id
+        if (id == currentLensId) return
+        currentLensId = id
+        if (savedMode != MODE_VIDEO || recording != null) return
+        handler.removeCallbacks(lensRunnable)
+        handler.postDelayed(lensRunnable, 350L)
+    }
+
+    private fun buildZoomChips() {
+        zoomRow.removeAllViews()
+        zoomChips.clear()
+        val cm = compat
+        val presets = cm?.presets() ?: emptyList()
+        if (presets.size < 2) {
+            zoomRow.visibility = View.GONE
+            return
+        }
+        zoomRow.visibility = View.VISIBLE
+        for (p in presets) {
+            val chip = TextView(requireContext()).apply {
+                text = if (p == p.toInt().toFloat()) "${p.toInt()}x" else String.format(Locale.US, "%.1fx", p)
+                gravity = Gravity.CENTER
+                textSize = 12f
+                typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+                setPadding(dp(12), 0, dp(12), 0)
+                minWidth = dp(40)
+                setOnClickListener { camera?.cameraControl?.setZoomRatio(p) }
+            }
+            zoomRow.addView(chip, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT))
+            zoomChips.add(Pair(p, chip))
+        }
+        updateZoomChips(lastZoom)
+    }
+
+    private fun updateZoomChips(zoom: Float) {
+        if (zoomChips.isEmpty() || view == null) return
+        val best = zoomChips.minByOrNull { Math.abs(it.first - zoom) }
+        for ((p, chip) in zoomChips) {
+            val on = best != null && p == best.first && Math.abs(p - zoom) < maxOf(0.12f, p * 0.08f)
+            chip.setBackgroundResource(if (on) R.drawable.pill_on else R.drawable.pill_off)
+            chip.setTextColor(ContextCompat.getColor(requireContext(), if (on) R.color.cam_ground else R.color.cam_dim))
+        }
     }
 
     private fun setUpExposure(cam: Camera) {
@@ -533,8 +681,11 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                 showVideoOptions()
             }
         }
+        updateLooksChip()
 
         chipFilters.setOnClickListener { toggleSheet(SHEET_FILTERS) }
+        tabFilters.setOnClickListener { lookTab = 0; updateLooksUi() }
+        tabEffects.setOnClickListener { lookTab = 1; updateLooksUi() }
         chipReference.setOnClickListener { toggleSheet(SHEET_REFERENCE) }
         modePhoto.setOnClickListener { setMode(MODE_PHOTO) }
         modeVideo.setOnClickListener { setMode(MODE_VIDEO) }
@@ -654,12 +805,12 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         if (recording != null || savedMode == mode) return
         savedMode = mode
         if (mode == MODE_VIDEO) {
-            if (sheetMode == SHEET_FILTERS) toggleSheet(SHEET_FILTERS)
             if (!hasPermission(Manifest.permission.RECORD_AUDIO)) {
                 audioPermission.launch(Manifest.permission.RECORD_AUDIO)
             }
         }
         updateModeUi()
+        updateLooksUi()
         bindCamera()
         updateTools()
     }
@@ -672,7 +823,6 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         modeVideo.setBackgroundResource(if (photo) R.drawable.pill_off else R.drawable.pill_on)
         modePhoto.setTextColor(if (photo) ground else dim)
         modeVideo.setTextColor(if (photo) dim else ground)
-        chipFilters.visibility = if (photo) View.VISIBLE else View.INVISIBLE
         shutterCore.setBackgroundResource(if (photo) R.drawable.shutter_core else R.drawable.shutter_rec_dot)
     }
 
@@ -684,36 +834,36 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     }
 
     private fun showVideoOptions() {
-        val fpsRanges = try {
-            camera?.cameraInfo?.supportedFrameRateRanges ?: emptySet<Range<Int>>()
-        } catch (e: Exception) {
-            emptySet<Range<Int>>()
-        }
-        val qualities = if (supportedQualities.isEmpty()) listOf(Quality.FHD) else supportedQualities
-        val labels = ArrayList<String>()
-        val picks = ArrayList<Pair<Quality, Int>>()
-        for (q in qualities) {
-            for (fps in listOf(24, 30, 60)) {
-                val ok = fpsRanges.isEmpty() && fps == 30 ||
-                    fpsRanges.any { it.lower <= fps && fps <= it.upper }
-                if (ok) {
-                    labels.add(qualityLabel(q) + fps + " fps")
-                    picks.add(Pair(q, fps))
-                }
-            }
-        }
-        if (picks.isEmpty()) {
-            toast("No other video settings are available")
+        if (recording != null) {
+            toast("Stop recording to change video quality")
             return
         }
+        val cm = compat
+        if (cm == null) {
+            toast("The camera is still starting")
+            return
+        }
+        val lens = cm.lensAt(lastZoom)
+        val options = cm.options(lastZoom, activeFx != null)
+        if (options.isEmpty()) {
+            toast("No video settings are available for this lens")
+            return
+        }
+        val labels = options.map {
+            it.label + " fps"
+        }.toTypedArray()
+        val checked = options.indexOfFirst { it.quality == savedQuality && it.fps == savedFps }
+        val note = if (activeFx != null) "\nEffects record up to 1080p 30" else ""
         AlertDialog.Builder(requireContext())
-            .setTitle("Video quality")
-            .setItems(labels.toTypedArray()) { _, which ->
-                savedQuality = picks[which].first
-                savedFps = picks[which].second
+            .setTitle("Video, ${lens.name} lens, ${String.format(Locale.US, "%.1f", lastZoom)}x$note")
+            .setSingleChoiceItems(labels, checked) { dialog, which ->
+                savedQuality = options[which].quality
+                savedFps = options[which].fps
+                dialog.dismiss()
                 bindCamera()
                 updateTools()
             }
+            .setNegativeButton("Cancel", null)
             .show()
     }
 
@@ -726,9 +876,9 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             updateTools()
         }
         toolSheet.visibility = if (sheetMode == SHEET_NONE) View.GONE else View.VISIBLE
-        filterScroll.visibility = if (sheetMode == SHEET_FILTERS) View.VISIBLE else View.GONE
+        updateLooksUi()
         referencePanel.visibility = if (sheetMode == SHEET_REFERENCE) View.VISIBLE else View.GONE
-        setChip(chipFilters, sheetMode == SHEET_FILTERS)
+        updateLooksChip()
         setChip(chipReference, sheetMode == SHEET_REFERENCE)
     }
 
@@ -763,6 +913,12 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     }
 
     private fun selectFilter(index: Int) {
+        if (index != 0 && activeFx != null) {
+            val name = activeFx?.name
+            applyFx(null)
+            effectPanel?.setActive(null)
+            toast("$name turned off. Filters and effects are not combined")
+        }
         savedFilter = index
         for (i in 0 until filterRow.childCount) {
             setChip(filterRow.getChildAt(i) as TextView, i == index)
@@ -791,6 +947,125 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             val paint = Paint().apply { colorFilter = ColorMatrixColorFilter(matrix) }
             tv.setLayerType(View.LAYER_TYPE_HARDWARE, paint)
         }
+    }
+
+    // ================================================================== effects
+
+    private fun buildEffectPanel() {
+        val panel = EffectPanel(requireContext())
+        panel.bind(fxList, fxSettings, 190)
+        panel.listener = object : EffectPanel.Listener {
+            override fun onActiveChanged(def: EffectDef?) { requestFx(def) }
+            override fun onParamsChanged(def: EffectDef) {
+                fxEffect?.processor?.params = fxSettings.snapshot(def)
+            }
+        }
+        panel.setActive(activeFx?.id)
+        effectHost.removeAllViews()
+        effectHost.addView(panel, FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        effectPanel = panel
+    }
+
+    private fun updateLooksUi() {
+        if (view == null) return
+        val looks = sheetMode == SHEET_FILTERS
+        val photo = savedMode == MODE_PHOTO
+        if (!photo) lookTab = 1
+        lookTabs.visibility = if (looks && photo) View.VISIBLE else View.GONE
+        filterScroll.visibility = if (looks && lookTab == 0) View.VISIBLE else View.GONE
+        effectHost.visibility = if (looks && lookTab == 1) View.VISIBLE else View.GONE
+        setChip(tabFilters, lookTab == 0)
+        setChip(tabEffects, lookTab == 1)
+    }
+
+    private fun updateLooksChip() {
+        if (view == null) return
+        chipFilters.text = activeFx?.name ?: "Looks"
+        setChip(chipFilters, sheetMode == SHEET_FILTERS || activeFx != null)
+    }
+
+    private fun markUnavailable() {
+        val m = HashMap<String, String>()
+        fxList.forEach { if (FxHub.isProbeFailed(it.id)) m[it.id] = "not supported on this GPU" }
+        effectPanel?.setUnavailable(m)
+    }
+
+    /** The user picked an effect (or none). Check it compiles on this GPU before touching the camera. */
+    private fun requestFx(def: EffectDef?) {
+        if (def == null) { applyFx(null); return }
+        if (recording != null && activeFx == null) {
+            toast("Stop recording to turn effects on")
+            effectPanel?.setActive(null)
+            return
+        }
+        FxHub.probe(def) { err ->
+            if (!isAdded || view == null) return@probe
+            if (err != null) {
+                toast("${def.name} is not supported on this phone: $err", true)
+                markUnavailable()
+                effectPanel?.setActive(activeFx?.id)
+            } else {
+                applyFx(def)
+            }
+        }
+    }
+
+    private fun applyFx(def: EffectDef?) {
+        val old = activeFx
+        if (old?.id == def?.id) return
+        val liveSwitch = old != null && def != null && fxEffect != null
+        if (recording != null && !liveSwitch) {
+            toast("Stop recording to turn effects on or off")
+            effectPanel?.setActive(old?.id)
+            return
+        }
+        activeFx = def
+        fxSettings.activeId = def?.id
+        if (def != null && savedFilter != 0) selectFilter(0)
+        updateLooksChip()
+        if (liveSwitch && def != null) {
+            fxEffect?.processor?.setEffect(def, fxSettings.snapshot(def)) { msg ->
+                handler.post { onFxFailure(msg) }
+            }
+            return
+        }
+        if (savedMode == MODE_VIDEO && def != null) {
+            val cm = compat
+            if (cm != null && !cm.isSupported(lastZoom, true, savedQuality, savedFps)) {
+                val n = cm.nearest(lastZoom, true, savedQuality, savedFps)
+                if (n != null) {
+                    savedQuality = n.quality
+                    savedFps = n.fps
+                    toast("Effects record up to 1080p 30: using ${n.label}")
+                }
+            }
+        }
+        bindCamera()
+        updateTools()
+    }
+
+    private fun disableFx() {
+        activeFx = null
+        fxSettings.activeId = null
+        effectPanel?.setActive(null)
+        updateLooksChip()
+    }
+
+    /** The GPU path failed while running. Switch the effect off and put the plain camera back. */
+    private fun onFxFailure(msg: String?) {
+        if (!isAdded || view == null) return
+        val def = activeFx ?: return
+        val wasRecording = recording != null
+        if (wasRecording) stopRecording()
+        disableFx()
+        val reason = if (msg.isNullOrBlank()) "" else ": $msg"
+        toast("${def.name} stopped$reason. The camera is back to normal", true)
+        handler.postDelayed({
+            if (isAdded && view != null) {
+                bindCamera()
+                updateTools()
+            }
+        }, if (wasRecording) 800L else 0L)
     }
 
     // ========================================================= reference image
@@ -1030,6 +1305,12 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             viewfinder.animate().alpha(1f).setDuration(140).start()
         }.start()
 
+        val fx = fxEffect
+        if (activeFx != null && fx != null) {
+            takeEffectPhoto(fx)
+            return
+        }
+
         val matrix = filters[savedFilter].matrix
         if (matrix == null) {
             val options = ImageCapture.OutputFileOptions.Builder(
@@ -1065,6 +1346,36 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                 }
             })
         }
+    }
+
+    /** Saves what the viewfinder shows: the processed frame at the preview's size and crop. */
+    private fun takeEffectPhoto(fx: FxEffect) {
+        if (flashMode != ImageCapture.FLASH_MODE_OFF) toast("Flash is not used with effects")
+        fx.processor.snapshot { bmp, err ->
+            if (bmp == null) {
+                handler.post { toast(err ?: "Could not capture the effect"); finishPhoto(null) }
+                return@snapshot
+            }
+            try {
+                cameraExecutor.execute {
+                    val uri = try { saveBitmap(bmp) } catch (e: Throwable) { null } finally { bmp.recycle() }
+                    handler.post { finishPhoto(uri) }
+                }
+            } catch (e: Exception) {
+                bmp.recycle()
+                handler.post { finishPhoto(null) }
+            }
+        }
+    }
+
+    private fun saveBitmap(output: Bitmap): Uri? {
+        val context = context ?: return null
+        val resolver = context.contentResolver
+        val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, photoValues(true)) ?: return null
+        resolver.openOutputStream(uri)?.use { output.compress(Bitmap.CompressFormat.JPEG, 95, it) }
+        val done = ContentValues().apply { put(MediaStore.MediaColumns.IS_PENDING, 0) }
+        resolver.update(uri, done, null, null)
+        return uri
     }
 
     private fun saveFiltered(image: ImageProxy, matrix: ColorMatrix): Uri? {
@@ -1159,7 +1470,14 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                 recording = null
                 setRecordingUi(false)
                 if (event.hasError()) {
-                    toast("The video could not be saved")
+                    if (event.error == VideoRecordEvent.Finalize.ERROR_ENCODING_FAILED ||
+                        event.error == VideoRecordEvent.Finalize.ERROR_RECORDER_ERROR
+                    ) {
+                        compat?.block(lastZoom, savedQuality, savedFps)
+                        toast("This video setting failed on your phone and has been hidden. Pick another one", true)
+                    } else {
+                        toast("The video could not be saved")
+                    }
                 } else {
                     val uri = event.outputResults.outputUri
                     lastUri = uri
@@ -1252,6 +1570,10 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         recording = null
         camera = null
         provider?.unbindAll()
+        fxEffect?.release()
+        fxEffect = null
+        effectPanel = null
+        FxHub.release()
         cameraExecutor.shutdown()
     }
 

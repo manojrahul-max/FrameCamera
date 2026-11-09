@@ -1,0 +1,710 @@
+{
+ "version": 1,
+ "effects": [
+  {
+   "id": "crt",
+   "name": "CRT",
+   "tagline": "Scanlines, curved glass, RGB split",
+   "hist": "none",
+   "live": true,
+   "shader": "effect_crt",
+   "params": [
+    {
+     "id": "intensity",
+     "label": "Intensity",
+     "min": 0,
+     "max": 1,
+     "def": 1
+    },
+    {
+     "id": "scale",
+     "label": "Scanline size",
+     "min": 0.5,
+     "max": 3,
+     "def": 1
+    },
+    {
+     "id": "contrast",
+     "label": "Contrast",
+     "min": 0.5,
+     "max": 2,
+     "def": 1.0
+    },
+    {
+     "id": "brightness",
+     "label": "Brightness",
+     "min": -0.4,
+     "max": 0.4,
+     "def": 0.0
+    },
+    {
+     "id": "curve",
+     "label": "Curvature",
+     "min": 0,
+     "max": 1,
+     "def": 0.5
+    },
+    {
+     "id": "rgb",
+     "label": "RGB split",
+     "min": 0,
+     "max": 1,
+     "def": 0.4
+    },
+    {
+     "id": "glow",
+     "label": "Glow",
+     "min": 0,
+     "max": 1,
+     "def": 0.5
+    },
+    {
+     "id": "flicker",
+     "label": "Flicker",
+     "min": 0,
+     "max": 1,
+     "def": 0.3
+    }
+   ]
+  },
+  {
+   "id": "receipt",
+   "name": "Receipt Paper",
+   "tagline": "Thermal print on faded paper",
+   "hist": "none",
+   "live": false,
+   "shader": "effect_receipt",
+   "params": [
+    {
+     "id": "intensity",
+     "label": "Intensity",
+     "min": 0,
+     "max": 1,
+     "def": 1
+    },
+    {
+     "id": "scale",
+     "label": "Dot size",
+     "min": 0.5,
+     "max": 3,
+     "def": 1
+    },
+    {
+     "id": "contrast",
+     "label": "Contrast",
+     "min": 0.5,
+     "max": 2,
+     "def": 1.0
+    },
+    {
+     "id": "brightness",
+     "label": "Brightness",
+     "min": -0.4,
+     "max": 0.4,
+     "def": 0.0
+    },
+    {
+     "id": "fade",
+     "label": "Ink fade",
+     "min": 0,
+     "max": 1,
+     "def": 0.35
+    },
+    {
+     "id": "paper",
+     "label": "Paper",
+     "min": 0,
+     "max": 2,
+     "def": 0,
+     "choices": [
+      "White",
+      "Cream",
+      "Grey"
+     ]
+    },
+    {
+     "id": "bands",
+     "label": "Print head streaks",
+     "min": 0,
+     "max": 1,
+     "def": 0.4
+    }
+   ]
+  },
+  {
+   "id": "depth",
+   "name": "Depth Map",
+   "tagline": "Estimated depth from focus and position",
+   "hist": "depth",
+   "live": false,
+   "shader": "effect_depth",
+   "params": [
+    {
+     "id": "intensity",
+     "label": "Intensity",
+     "min": 0,
+     "max": 1,
+     "def": 1
+    },
+    {
+     "id": "scale",
+     "label": "Smoothing",
+     "min": 0.5,
+     "max": 4,
+     "def": 1.5
+    },
+    {
+     "id": "contrast",
+     "label": "Contrast",
+     "min": 0.5,
+     "max": 2,
+     "def": 1.0
+    },
+    {
+     "id": "brightness",
+     "label": "Brightness",
+     "min": -0.4,
+     "max": 0.4,
+     "def": 0.0
+    },
+    {
+     "id": "bias",
+     "label": "Depth bias",
+     "min": -1,
+     "max": 1,
+     "def": 0
+    },
+    {
+     "id": "mode",
+     "label": "View",
+     "min": 0,
+     "max": 2,
+     "def": 0,
+     "choices": [
+      "Heat",
+      "Grayscale",
+      "Subject"
+     ]
+    },
+    {
+     "id": "plane",
+     "label": "Focus plane",
+     "min": 0,
+     "max": 1,
+     "def": 0.6
+    },
+    {
+     "id": "position",
+     "label": "Position cue",
+     "min": 0,
+     "max": 1,
+     "def": 0.4
+    }
+   ]
+  },
+  {
+   "id": "blob",
+   "name": "Blob Tracking",
+   "tagline": "Outlines of moving regions",
+   "hist": "motion",
+   "live": true,
+   "shader": "effect_blob",
+   "params": [
+    {
+     "id": "intensity",
+     "label": "Intensity",
+     "min": 0,
+     "max": 1,
+     "def": 1
+    },
+    {
+     "id": "scale",
+     "label": "Outline width",
+     "min": 0.5,
+     "max": 3,
+     "def": 1
+    },
+    {
+     "id": "contrast",
+     "label": "Contrast",
+     "min": 0.5,
+     "max": 2,
+     "def": 1.0
+    },
+    {
+     "id": "brightness",
+     "label": "Brightness",
+     "min": -0.4,
+     "max": 0.4,
+     "def": 0.0
+    },
+    {
+     "id": "sens",
+     "label": "Sensitivity",
+     "min": 0,
+     "max": 1,
+     "def": 0.55
+    },
+    {
+     "id": "trail",
+     "label": "Trail",
+     "min": 0,
+     "max": 1,
+     "def": 0.5
+    },
+    {
+     "id": "style",
+     "label": "Style",
+     "min": 0,
+     "max": 2,
+     "def": 1,
+     "choices": [
+      "Outline",
+      "Outline + fill",
+      "Mask only"
+     ]
+    },
+    {
+     "id": "hue",
+     "label": "Color",
+     "min": 0,
+     "max": 1,
+     "def": 0.38
+    }
+   ]
+  },
+  {
+   "id": "datamosh",
+   "name": "Datamosh",
+   "tagline": "Motion smears a stale frame",
+   "hist": "mosh",
+   "live": true,
+   "shader": "effect_datamosh",
+   "params": [
+    {
+     "id": "intensity",
+     "label": "Intensity",
+     "min": 0,
+     "max": 1,
+     "def": 1
+    },
+    {
+     "id": "scale",
+     "label": "Block size",
+     "min": 0.5,
+     "max": 3,
+     "def": 1
+    },
+    {
+     "id": "contrast",
+     "label": "Contrast",
+     "min": 0.5,
+     "max": 2,
+     "def": 1.0
+    },
+    {
+     "id": "brightness",
+     "label": "Brightness",
+     "min": -0.4,
+     "max": 0.4,
+     "def": 0.0
+    },
+    {
+     "id": "smear",
+     "label": "Smear",
+     "min": 0,
+     "max": 1,
+     "def": 0.6
+    },
+    {
+     "id": "glitch",
+     "label": "Glitch blocks",
+     "min": 0,
+     "max": 1,
+     "def": 0.3
+    },
+    {
+     "id": "refresh",
+     "label": "Keyframe interval (s)",
+     "min": 1,
+     "max": 8,
+     "def": 3
+    },
+    {
+     "id": "bleed",
+     "label": "Chroma bleed",
+     "min": 0,
+     "max": 1,
+     "def": 0.3
+    }
+   ]
+  },
+  {
+   "id": "dither",
+   "name": "1-Bit Dither",
+   "tagline": "Two colours, adjustable pattern",
+   "hist": "none",
+   "live": false,
+   "shader": "effect_dither",
+   "params": [
+    {
+     "id": "intensity",
+     "label": "Intensity",
+     "min": 0,
+     "max": 1,
+     "def": 1
+    },
+    {
+     "id": "scale",
+     "label": "Pixel size",
+     "min": 0.5,
+     "max": 4,
+     "def": 1
+    },
+    {
+     "id": "contrast",
+     "label": "Contrast",
+     "min": 0.5,
+     "max": 2,
+     "def": 1.0
+    },
+    {
+     "id": "brightness",
+     "label": "Brightness",
+     "min": -0.4,
+     "max": 0.4,
+     "def": 0.0
+    },
+    {
+     "id": "pattern",
+     "label": "Pattern",
+     "min": 0,
+     "max": 4,
+     "def": 0,
+     "choices": [
+      "Bayer 4",
+      "Bayer 8",
+      "Halftone",
+      "Lines",
+      "Noise"
+     ]
+    },
+    {
+     "id": "threshold",
+     "label": "Threshold",
+     "min": -0.4,
+     "max": 0.4,
+     "def": 0
+    },
+    {
+     "id": "palette",
+     "label": "Colours",
+     "min": 0,
+     "max": 4,
+     "def": 0,
+     "choices": [
+      "Black and white",
+      "Green",
+      "Amber",
+      "Handheld",
+      "Ink on paper"
+     ]
+    },
+    {
+     "id": "invert",
+     "label": "Invert",
+     "min": 0,
+     "max": 1,
+     "def": 0,
+     "choices": [
+      "Off",
+      "On"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "night",
+   "name": "Night Vision",
+   "tagline": "Green phosphor, grain, vignette",
+   "hist": "none",
+   "live": true,
+   "shader": "effect_night",
+   "params": [
+    {
+     "id": "intensity",
+     "label": "Intensity",
+     "min": 0,
+     "max": 1,
+     "def": 1
+    },
+    {
+     "id": "scale",
+     "label": "Grain size",
+     "min": 0.5,
+     "max": 3,
+     "def": 1
+    },
+    {
+     "id": "contrast",
+     "label": "Contrast",
+     "min": 0.5,
+     "max": 2,
+     "def": 1.0
+    },
+    {
+     "id": "brightness",
+     "label": "Brightness",
+     "min": -0.4,
+     "max": 0.4,
+     "def": 0.0
+    },
+    {
+     "id": "gain",
+     "label": "Gain",
+     "min": 0.8,
+     "max": 4,
+     "def": 1.5
+    },
+    {
+     "id": "noise",
+     "label": "Noise",
+     "min": 0,
+     "max": 1,
+     "def": 0.5
+    },
+    {
+     "id": "glow",
+     "label": "Phosphor glow",
+     "min": 0,
+     "max": 1,
+     "def": 0.5
+    },
+    {
+     "id": "vignette",
+     "label": "Vignette",
+     "min": 0,
+     "max": 1,
+     "def": 0.6
+    }
+   ]
+  },
+  {
+   "id": "thermal",
+   "name": "Thermal Noise",
+   "tagline": "Heat-map colours with sensor noise",
+   "hist": "none",
+   "live": true,
+   "shader": "effect_thermal",
+   "params": [
+    {
+     "id": "intensity",
+     "label": "Intensity",
+     "min": 0,
+     "max": 1,
+     "def": 1
+    },
+    {
+     "id": "scale",
+     "label": "Noise scale",
+     "min": 0.5,
+     "max": 3,
+     "def": 1
+    },
+    {
+     "id": "contrast",
+     "label": "Contrast",
+     "min": 0.5,
+     "max": 2,
+     "def": 1.0
+    },
+    {
+     "id": "brightness",
+     "label": "Brightness",
+     "min": -0.4,
+     "max": 0.4,
+     "def": 0.0
+    },
+    {
+     "id": "palette",
+     "label": "Palette",
+     "min": 0,
+     "max": 3,
+     "def": 0,
+     "choices": [
+      "Iron",
+      "Rainbow",
+      "White hot",
+      "Plasma"
+     ]
+    },
+    {
+     "id": "noise",
+     "label": "Noise",
+     "min": 0,
+     "max": 1,
+     "def": 0.35
+    },
+    {
+     "id": "bloom",
+     "label": "Bloom",
+     "min": 0,
+     "max": 1,
+     "def": 0.4
+    },
+    {
+     "id": "bands",
+     "label": "Isotherm bands",
+     "min": 0,
+     "max": 1,
+     "def": 0.3
+    }
+   ]
+  },
+  {
+   "id": "glyph",
+   "name": "Glyph Grid",
+   "tagline": "Characters sized by brightness",
+   "hist": "none",
+   "live": false,
+   "shader": "effect_glyph",
+   "params": [
+    {
+     "id": "intensity",
+     "label": "Intensity",
+     "min": 0,
+     "max": 1,
+     "def": 1
+    },
+    {
+     "id": "scale",
+     "label": "Density",
+     "min": 0.5,
+     "max": 3,
+     "def": 1
+    },
+    {
+     "id": "contrast",
+     "label": "Contrast",
+     "min": 0.5,
+     "max": 2,
+     "def": 1.0
+    },
+    {
+     "id": "brightness",
+     "label": "Brightness",
+     "min": -0.4,
+     "max": 0.4,
+     "def": 0.0
+    },
+    {
+     "id": "charset",
+     "label": "Characters",
+     "min": 0,
+     "max": 3,
+     "def": 0,
+     "choices": [
+      "Classic",
+      "Digits",
+      "Symbols",
+      "Letters"
+     ]
+    },
+    {
+     "id": "color",
+     "label": "Colour",
+     "min": 0,
+     "max": 4,
+     "def": 0,
+     "choices": [
+      "Source",
+      "Green",
+      "Amber",
+      "White",
+      "Cyan"
+     ]
+    },
+    {
+     "id": "glow",
+     "label": "Glow",
+     "min": 0,
+     "max": 1,
+     "def": 0.3
+    },
+    {
+     "id": "backdrop",
+     "label": "Backdrop",
+     "min": 0,
+     "max": 1,
+     "def": 0.35
+    }
+   ]
+  },
+  {
+   "id": "liquid",
+   "name": "Liquid Screen",
+   "tagline": "Fluid warp and ripples",
+   "hist": "none",
+   "live": true,
+   "shader": "effect_liquid",
+   "params": [
+    {
+     "id": "intensity",
+     "label": "Intensity",
+     "min": 0,
+     "max": 1,
+     "def": 1
+    },
+    {
+     "id": "scale",
+     "label": "Wavelength",
+     "min": 0.5,
+     "max": 3,
+     "def": 1
+    },
+    {
+     "id": "contrast",
+     "label": "Contrast",
+     "min": 0.5,
+     "max": 2,
+     "def": 1.0
+    },
+    {
+     "id": "brightness",
+     "label": "Brightness",
+     "min": -0.4,
+     "max": 0.4,
+     "def": 0.0
+    },
+    {
+     "id": "warp",
+     "label": "Warp",
+     "min": 0,
+     "max": 1,
+     "def": 0.5
+    },
+    {
+     "id": "speed",
+     "label": "Speed",
+     "min": 0,
+     "max": 2,
+     "def": 1
+    },
+    {
+     "id": "ripples",
+     "label": "Ripples",
+     "min": 0,
+     "max": 1,
+     "def": 0.5
+    },
+    {
+     "id": "shimmer",
+     "label": "Chroma shimmer",
+     "min": 0,
+     "max": 1,
+     "def": 0.3
+    }
+   ]
+  }
+ ]
+}
