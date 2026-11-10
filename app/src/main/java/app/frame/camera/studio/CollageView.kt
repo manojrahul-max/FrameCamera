@@ -423,12 +423,12 @@ class CollageView(ctx: Context) : View(ctx) {
         selected = -1; changed(); listener?.onSelection()
     }
 
-    fun bringToFront() {
+    fun bringFrameForward() {
         val f = collage.frames.getOrNull(selected) ?: return
         checkpoint(); collage.frames.removeAt(selected); collage.frames.add(f); selected = collage.frames.size - 1; changed()
     }
 
-    fun sendToBack() {
+    fun sendFrameBack() {
         val f = collage.frames.getOrNull(selected) ?: return
         checkpoint(); collage.frames.removeAt(selected); collage.frames.add(0, f); selected = 0; changed()
     }

@@ -338,7 +338,9 @@ class CollageFragment : Fragment(), CollageView.Listener {
         col.addView(info)
         val r = Ui.row(ctx).apply { gravity = Gravity.CENTER }
         r.addView(Ui.chip(ctx, "Flip") { camera?.flip(); camera?.let { c -> look?.let { e -> c.setCustom(e) } } }, LinearLayout.LayoutParams(-2, Ui.dp(ctx, 38)).also { it.marginEnd = Ui.dp(ctx, 8) })
-        r.addView(Ui.chip(ctx, "Look: " + (look?.name ?: "none")) { pickLook(it as TextView) }, LinearLayout.LayoutParams(-2, Ui.dp(ctx, 38)).also { it.marginEnd = Ui.dp(ctx, 8) })
+        val lookChip = Ui.chip(ctx, "Look: " + (look?.name ?: "none"))
+        lookChip.setOnClickListener { pickLook(lookChip) }
+        r.addView(lookChip, LinearLayout.LayoutParams(-2, Ui.dp(ctx, 38)).also { it.marginEnd = Ui.dp(ctx, 8) })
         val shutter = View(ctx).apply {
             setBackgroundResource(R.drawable.shutter_ring)
             setOnClickListener { capture() }
@@ -416,7 +418,7 @@ class CollageFragment : Fragment(), CollageView.Listener {
             LinearLayout.LayoutParams(-1, Ui.dp(ctx, 36)).also { it.topMargin = Ui.dp(ctx, 8) })
         col.addView(Ui.scrollRow(ctx, listOf(
             c("Rectangle") { cv.setShape(SHAPE_POLY) }, c("Oval") { cv.setShape(SHAPE_ELLIPSE) }, c("Heart") { cv.setShape(SHAPE_HEART) },
-            c("Diamond") { cv.setShape(3) }, c("Bring front") { cv.bringToFront() }, c("Send back") { cv.sendToBack() }), 36),
+            c("Diamond") { cv.setShape(3) }, c("Bring front") { cv.bringFrameForward() }, c("Send back") { cv.sendFrameBack() }), 36),
             LinearLayout.LayoutParams(-1, Ui.dp(ctx, 36)).also { it.topMargin = Ui.dp(ctx, 8) })
         col.addView(Ui.scrollRow(ctx, listOf(
             c("Aspect: " + aspectName()) { chooseAspect() }, c("Save as template") { saveTemplate() }), 36),
