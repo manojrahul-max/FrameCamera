@@ -103,7 +103,16 @@ object FxHub {
     fun renderPicture(def: EffectDef, params: FloatArray, bmp: Bitmap, maxSide: Int, cb: (Bitmap?, String?) -> Unit) {
         val s = synchronized(this) { still }
         if (s == null) { cb(null, "Effects are not ready"); return }
-        s.render(def, params, listOf(bmp), maxSide, 1.5f, cb)
+        s.render(def, params, listOf(bmp), maxSide, 1.5f, null, cb)
+    }
+
+    /** Applies a custom layered effect to a picture, with the same shader the live camera uses. */
+    fun renderCustom(e: app.frame.camera.studio.CustomEffect, bmp: Bitmap, maxSide: Int, cb: (Bitmap?, String?) -> Unit) {
+        val s = synchronized(this) { still }
+        if (s == null) { cb(null, "Effects are not ready"); return }
+        val aspect = bmp.width.toFloat() / bmp.height
+        s.render(app.frame.camera.studio.CustomEffect.DEF, app.frame.camera.studio.CustomEffect.params(e),
+            listOf(bmp), maxSide, 1.5f, e.payload(aspect), cb)
     }
 
     private fun cover(src: Bitmap): Bitmap {

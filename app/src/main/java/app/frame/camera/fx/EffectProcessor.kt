@@ -62,6 +62,7 @@ class FxProcessor(
 
     @Volatile var effect: EffectDef? = null
     @Volatile var params: FloatArray = FloatArray(8)
+    @Volatile var custom: app.frame.camera.studio.CustomPayload? = null
 
     private var snapshotCb: ((Bitmap?, String?) -> Unit)? = null
 
@@ -152,6 +153,7 @@ class FxProcessor(
             }
             Matrix.invertM(texInv, 0, texMat, 0)
             val p = params
+            r.setCustom(custom)
             val t = ((System.nanoTime() - startNs) / 1e9f) % 3600f
             r.prepareFrame(inTex, texMat, inW, inH, p, t)
             var snapDone = false

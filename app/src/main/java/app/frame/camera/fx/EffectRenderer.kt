@@ -60,6 +60,37 @@ class EffectRenderer(private val ctx: Context, private val external: Boolean) {
     private var mcur = 0
     private var first = true
 
+    // Custom (layered) effect state. The payload is set from any thread and read on the GL thread.
+    @Volatile private var custom: app.frame.camera.studio.CustomPayload? = null
+    private var maskTex = 0
+    private var maskVer = -1
+
+    fun setCustom(p: app.frame.camera.studio.CustomPayload?) { custom = p }
+
+    private fun uploadCustom(prog: Int) {
+        val p = custom ?: return
+        for (i in 0 until 9) {
+            val l = loc(prog, "uL$i")
+            if (l >= 0) GLES20.glUniform4fv(l, 4, p.uniforms, i * 16)
+        }
+        if (loc(prog, "uMask") < 0) return
+        if (maskTex == 0) { maskTex = Gl.newTexture(); maskVer = -1 }
+        if (maskVer != p.version) {
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + 5)
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, maskTex)
+            GLES20.glPixelStorei(GLES20.GL_UNPACK_ALIGNMENT, 1)
+            val data = p.mask
+            if (data == null) {
+                GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, 1, 1, 0, GLES20.GL_RGBA,
+                    GLES20.GL_UNSIGNED_BYTE, ByteBuffer.wrap(ByteArray(4)))
+            } else {
+                GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, p.maskW, p.maskH, 0, GLES20.GL_RGBA,
+                    GLES20.GL_UNSIGNED_BYTE, ByteBuffer.wrap(data))
+            }
+            maskVer = p.version
+        }
+    }
+
     private fun asset(name: String): String = synchronized(sources) {
         sources.getOrPut(name) { ctx.applicationContext.assets.open("shaders/$name").bufferedReader().use { it.readText() } }
     }
@@ -155,6 +186,10 @@ class EffectRenderer(private val ctx: Context, private val external: Boolean) {
         bind(prog, "uPrevH", 2, GLES20.GL_TEXTURE_2D, prev)
         bind(prog, "uMosh", 3, GLES20.GL_TEXTURE_2D, mosh)
         bind(prog, "uGlyph", 4, GLES20.GL_TEXTURE_2D, glyphTex)
+        if (prog == progEffect && effect?.id == "custom") {
+            uploadCustom(prog)
+            bind(prog, "uMask", 5, GLES20.GL_TEXTURE_2D, maskTex)
+        }
         GLES20.glEnableVertexAttribArray(0)
         GLES20.glVertexAttribPointer(0, 2, GLES20.GL_FLOAT, false, 0, quad)
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
@@ -230,6 +265,7 @@ class EffectRenderer(private val ctx: Context, private val external: Boolean) {
         if (progMosh != 0) GLES20.glDeleteProgram(progMosh)
         progEffect = 0; progHist = 0; progMosh = 0
         Gl.deleteTexture(glyphTex); glyphTex = 0
+        Gl.deleteTexture(maskTex); maskTex = 0; maskVer = -1
         locs.clear()
         cur = 0; mcur = 0; first = true
     }

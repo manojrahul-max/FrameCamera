@@ -172,6 +172,8 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     private lateinit var fxSettings: EffectSettings
     private var fxList: List<EffectDef> = emptyList()
     private var activeFx: EffectDef? = null
+    /** A saved custom effect chosen in My Creations. When set, [activeFx] is the shared custom definition. */
+    private var activeCustom: app.frame.camera.studio.CustomEffect? = null
     private var fxEffect: FxEffect? = null
     private var effectPanel: EffectPanel? = null
     private var compat: CompatMatrix? = null
@@ -291,6 +293,15 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         fxSettings = EffectSettings(requireContext())
         fxList = EffectCatalog.all(requireContext())
         activeFx = EffectCatalog.byId(requireContext(), fxSettings.activeId)
+        run {
+            val cid = app.frame.camera.studio.CreationStore.cameraEffectId(requireContext())
+            if (cid != null) {
+                app.frame.camera.studio.CustomSchema.load(requireContext())
+                val ce = app.frame.camera.studio.CreationStore.loadEffect(requireContext(), cid)
+                if (ce != null) { activeCustom = ce; activeFx = app.frame.camera.studio.CustomEffect.DEF }
+                else app.frame.camera.studio.CreationStore.setCameraEffect(requireContext(), null)
+            }
+        }
         if (activeFx != null) savedFilter = 0
         FxHub.acquire(requireContext())
         buildEffectPanel()
@@ -458,6 +469,11 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             }
             fx.processor.effect = def
             fx.processor.params = fxSettings.snapshot(def)
+            val ce = activeCustom
+            if (ce != null) {
+                fx.processor.params = app.frame.camera.studio.CustomEffect.params(ce)
+                fx.processor.custom = ce.payload(viewfinderW.toFloat() / viewfinderH)
+            }
             group.addEffect(fx)
         }
 
@@ -980,7 +996,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     private fun updateLooksChip() {
         if (view == null) return
-        chipFilters.text = activeFx?.name ?: "Looks"
+        chipFilters.text = activeCustom?.name ?: activeFx?.name ?: "Looks"
         setChip(chipFilters, sheetMode == SHEET_FILTERS || activeFx != null)
     }
 
@@ -1013,6 +1029,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     private fun applyFx(def: EffectDef?) {
         val old = activeFx
         if (old?.id == def?.id) return
+        if (activeCustom != null) { activeCustom = null; app.frame.camera.studio.CreationStore.setCameraEffect(requireContext(), null) }
         val liveSwitch = old != null && def != null && fxEffect != null
         if (recording != null && !liveSwitch) {
             toast("Stop recording to turn effects on or off")
@@ -1045,6 +1062,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     }
 
     private fun disableFx() {
+        if (activeCustom != null) { activeCustom = null; context?.let { app.frame.camera.studio.CreationStore.setCameraEffect(it, null) } }
         activeFx = null
         fxSettings.activeId = null
         effectPanel?.setActive(null)

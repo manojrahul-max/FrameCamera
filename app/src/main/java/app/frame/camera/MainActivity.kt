@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
 
     private val tabs = listOf(
         Tab("Camera", R.drawable.ic_camera, true) { CameraFragment() },
-        Tab("Effects", R.drawable.ic_effects, true) { EffectsFragment() },
+        Tab("Studio", R.drawable.ic_effects, true) { app.frame.camera.studio.StudioFragment() },
         Tab("Gallery", R.drawable.ic_gallery, false) { GalleryFragment() }
     )
 

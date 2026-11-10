@@ -58,12 +58,13 @@ class StillRenderer(private val ctx: Context) {
      * frames in order so they have real frame to frame motion to analyse.
      */
     fun render(def: EffectDef, params: FloatArray, frames: List<Bitmap>, maxSide: Int, timeSec: Float,
+               custom: app.frame.camera.studio.CustomPayload? = null,
                done: (Bitmap?, String?) -> Unit) {
         handler.post {
             var result: Bitmap? = null
             var error: String? = null
             try {
-                result = renderNow(def, params, frames, maxSide, timeSec)
+                result = renderNow(def, params, frames, maxSide, timeSec, custom)
             } catch (t: Throwable) {
                 error = t.message ?: "The effect could not be applied"
             }
@@ -71,9 +72,11 @@ class StillRenderer(private val ctx: Context) {
         }
     }
 
-    private fun renderNow(def: EffectDef, params: FloatArray, frames: List<Bitmap>, maxSide: Int, timeSec: Float): Bitmap {
+    private fun renderNow(def: EffectDef, params: FloatArray, frames: List<Bitmap>, maxSide: Int, timeSec: Float,
+                          custom: app.frame.camera.studio.CustomPayload? = null): Bitmap {
         val r = gl()
         r.setEffect(def)
+        r.setCustom(custom)
         r.resetHistory()
         val last = frames.last()
         val scale = minOf(1f, maxSide.toFloat() / maxOf(last.width, last.height))
