@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Frame</string>
+    <string name="shutter">Take photo or record</string>
+    <string name="flip_camera">Switch camera</string>
+    <string name="pause_recording">Pause or resume recording</string>
+    <string name="last_photo">Open last capture</string>
+    <string name="need_permission">Frame needs camera access. Allow it in Settings, then reopen the app.</string>
+</resources>

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/headerBar"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="20dp"
+        android:paddingEnd="12dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-light"
+            android:text="Gallery"
+            android:textColor="@color/ink"
+            android:textSize="28sp" />
+
+        <ImageView
+            android:id="@+id/sortButton"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:contentDescription="Sort"
+            android:padding="11dp"
+            android:src="@drawable/ic_sort"
+            app:tint="@color/ink"
+            xmlns:app="http://schemas.android.com/apk/res-auto" />
+
+        <ImageView
+            android:id="@+id/viewButton"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:contentDescription="Switch between grid and list"
+            android:padding="11dp"
+            android:src="@drawable/ic_list"
+            app:tint="@color/ink"
+            xmlns:app="http://schemas.android.com/apk/res-auto" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginStart="20dp"
+        android:background="@drawable/glass_panel"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="3dp">
+
+        <TextView
+            android:id="@+id/segPhotos"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:text="Photos"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/segVideos"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:text="Videos"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/selectionBar"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/glass_panel"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="6dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/selectionCount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-medium"
+            android:text="0 selected"
+            android:textColor="@color/ink"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/actFavorite"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:contentDescription="Favorite"
+            android:padding="11dp"
+            android:src="@drawable/ic_heart"
+            app:tint="@color/ink"
+            xmlns:app="http://schemas.android.com/apk/res-auto" />
+
+        <ImageView
+            android:id="@+id/actShare"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:contentDescription="Share"
+            android:padding="11dp"
+            android:src="@drawable/ic_share"
+            app:tint="@color/ink"
+            xmlns:app="http://schemas.android.com/apk/res-auto" />
+
+        <ImageView
+            android:id="@+id/actDelete"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:contentDescription="Delete"
+            android:padding="11dp"
+            android:src="@drawable/ic_trash"
+            app:tint="@color/ink"
+            xmlns:app="http://schemas.android.com/apk/res-auto" />
+
+        <ImageView
+            android:id="@+id/actClose"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:contentDescription="Cancel selection"
+            android:padding="11dp"
+            android:src="@drawable/ic_close"
+            app:tint="@color/ink"
+            xmlns:app="http://schemas.android.com/apk/res-auto" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/mediaList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingStart="8dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="12dp" />
+
+        <TextView
+            android:id="@+id/emptyText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:paddingStart="40dp"
+            android:paddingEnd="40dp"
+            android:text="Nothing here yet. Photos and videos you take with Frame appear in this tab."
+            android:textColor="@color/ink_dim"
+            android:textSize="14sp"
+            android:visibility="gone" />
+    </FrameLayout>
+</LinearLayout>

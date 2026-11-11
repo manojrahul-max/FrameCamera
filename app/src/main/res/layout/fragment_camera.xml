@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cameraRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cam_ground">
+
+    <FrameLayout
+        android:id="@+id/viewfinder"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_gravity="top|center_horizontal"
+        android:background="@color/cam_well">
+
+        <androidx.camera.view.PreviewView
+            android:id="@+id/previewView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:scaleType="fillCenter" />
+
+        <app.frame.camera.GridOverlay
+            android:id="@+id/gridOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:id="@+id/referenceImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:importantForAccessibility="no"
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
+
+        <View
+            android:id="@+id/focusRing"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:alpha="0"
+            android:background="@drawable/focus_box" />
+
+        <View
+            android:id="@+id/touchSurface"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:layout_gravity="top"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/glass_cam"
+        android:orientation="horizontal"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp">
+
+        <app.frame.camera.ToolButton
+            android:id="@+id/btnFlash"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:toolIcon="@drawable/ic_flash"
+            app:toolLabel="Off" />
+
+        <app.frame.camera.ToolButton
+            android:id="@+id/btnTimer"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:toolIcon="@drawable/ic_timer"
+            app:toolLabel="Off" />
+
+        <app.frame.camera.ToolButton
+            android:id="@+id/btnRatio"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:toolIcon="@drawable/ic_ratio"
+            app:toolLabel="4:3" />
+
+        <app.frame.camera.ToolButton
+            android:id="@+id/btnGrid"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:toolIcon="@drawable/ic_grid"
+            app:toolLabel="Off" />
+
+        <app.frame.camera.ToolButton
+            android:id="@+id/btnExposure"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:toolIcon="@drawable/ic_exposure"
+            app:toolLabel="EV" />
+
+        <app.frame.camera.ToolButton
+            android:id="@+id/btnMode"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:toolIcon="@drawable/ic_burst"
+            app:toolLabel="Burst" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/recBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="76dp"
+        android:background="@drawable/glass_cam_pill"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="12dp"
+        android:paddingEnd="14dp"
+        android:visibility="gone">
+
+        <View
+            android:id="@+id/recDot"
+            android:layout_width="9dp"
+            android:layout_height="9dp"
+            android:background="@drawable/rec_dot" />
+
+        <TextView
+            android:id="@+id/recTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="00:00"
+            android:textColor="@color/cam_ink"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/zoomText"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="76dp"
+        android:background="@drawable/glass_cam_pill"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:minWidth="56dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:text="1.0x"
+        android:textColor="@color/cam_ink"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="116dp"
+        android:background="@drawable/glass_cam_pill"
+        android:paddingStart="14dp"
+        android:paddingTop="7dp"
+        android:paddingEnd="14dp"
+        android:paddingBottom="7dp"
+        android:text="Drag to move, pinch to resize, double tap to reset"
+        android:textColor="@color/cam_ink"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/countdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="sans-serif-light"
+        android:textColor="@color/cam_ink"
+        android:textSize="120sp"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/exposurePanel"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="156dp"
+        android:background="@drawable/glass_cam"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:text="Exposure"
+            android:textColor="@color/cam_dim"
+            android:textSize="12sp" />
+
+        <SeekBar
+            android:id="@+id/exposureSeek"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:progressTint="@color/cam_accent"
+            android:thumbTint="@color/cam_accent" />
+
+        <TextView
+            android:id="@+id/exposureValue"
+            android:layout_width="44dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="end"
+            android:text="0.0"
+            android:textColor="@color/cam_ink"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/zoomRow"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="158dp"
+        android:background="@drawable/glass_cam_pill"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="3dp"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/toolSheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="156dp"
+        android:background="@drawable/glass_cam"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/lookTabs"
+            android:layout_width="match_parent"
+            android:layout_height="34dp"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tabFilters"
+                style="@style/CamChip"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:text="Filters" />
+
+            <TextView
+                android:id="@+id/tabEffects"
+                style="@style/CamChip"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Effects" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/effectHost"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <HorizontalScrollView
+            android:id="@+id/filterScroll"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/filterRow"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" />
+        </HorizontalScrollView>
+
+        <LinearLayout
+            android:id="@+id/referencePanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/uploadButton"
+                style="@style/CamChip"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:text="Upload reference image" />
+
+            <LinearLayout
+                android:id="@+id/refControls"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Opacity"
+                        android:textColor="@color/cam_dim"
+                        android:textSize="12sp" />
+
+                    <SeekBar
+                        android:id="@+id/opacitySeek"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:max="100"
+                        android:progress="45"
+                        android:progressTint="@color/cam_accent"
+                        android:thumbTint="@color/cam_accent" />
+
+                    <TextView
+                        android:id="@+id/opacityValue"
+                        android:layout_width="44dp"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:gravity="end"
+                        android:text="45%"
+                        android:textColor="@color/cam_ink"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/adjustButton"
+                        style="@style/CamChip"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:text="Adjust" />
+
+                    <TextView
+                        android:id="@+id/mirrorButton"
+                        style="@style/CamChip"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:text="Mirror" />
+
+                    <TextView
+                        android:id="@+id/replaceButton"
+                        style="@style/CamChip"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        android:text="Replace" />
+
+                    <TextView
+                        android:id="@+id/removeButton"
+                        style="@style/CamChip"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_weight="1"
+                        android:text="Remove" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bottomControls"
+        android:layout_width="match_parent"
+        android:layout_height="148dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/scrim_bottom"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/chipFilters"
+                style="@style/CamChip"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="Looks" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/glass_cam_pill"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="3dp">
+
+                <TextView
+                    android:id="@+id/modePhoto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="Photo"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/modeVideo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="Video"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/chipReference"
+                style="@style/CamChip"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="Reference" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipChildren="false">
+
+            <ImageView
+                android:id="@+id/thumbnail"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_gravity="center_vertical|start"
+                android:layout_marginStart="32dp"
+                android:background="@drawable/chip_cam_off"
+                android:contentDescription="@string/last_photo"
+                android:padding="1dp"
+                android:scaleType="centerCrop" />
+
+            <ImageView
+                android:id="@+id/pauseButton"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_gravity="center_vertical|start"
+                android:layout_marginStart="32dp"
+                android:background="@drawable/circle_cam"
+                android:contentDescription="@string/pause_recording"
+                android:padding="14dp"
+                android:src="@drawable/ic_pause"
+                android:visibility="gone"
+                app:tint="@color/cam_ink" />
+
+            <FrameLayout
+                android:id="@+id/shutter"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/shutter">
+
+                <View
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/shutter_glow" />
+
+                <View
+                    android:layout_width="76dp"
+                    android:layout_height="76dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/shutter_ring" />
+
+                <View
+                    android:id="@+id/shutterCore"
+                    android:layout_width="58dp"
+                    android:layout_height="58dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/shutter_core" />
+            </FrameLayout>
+
+            <ImageView
+                android:id="@+id/flipButton"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_gravity="center_vertical|end"
+                android:layout_marginEnd="32dp"
+                android:background="@drawable/circle_cam"
+                android:contentDescription="@string/flip_camera"
+                android:padding="14dp"
+                android:src="@drawable/ic_flip"
+                app:tint="@color/cam_ink" />
+        </FrameLayout>
+    </LinearLayout>
+</FrameLayout>

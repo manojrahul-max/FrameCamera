@@ -1,0 +1,6 @@
+<resources>
+    <declare-styleable name="ToolButton">
+        <attr name="toolIcon" format="reference" />
+        <attr name="toolLabel" format="string" />
+    </declare-styleable>
+</resources>
