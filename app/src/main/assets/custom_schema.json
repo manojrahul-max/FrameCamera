@@ -1,0 +1,385 @@
+{
+ "layers": 4,
+ "arrays": 9,
+ "adjustments": [
+  {
+   "key": "exposure",
+   "label": "Exposure",
+   "min": -2,
+   "max": 2,
+   "def": 0,
+   "group": "Light",
+   "arr": 0,
+   "comp": 0
+  },
+  {
+   "key": "brightness",
+   "label": "Brightness",
+   "min": -0.5,
+   "max": 0.5,
+   "def": 0,
+   "group": "Light",
+   "arr": 0,
+   "comp": 1
+  },
+  {
+   "key": "contrast",
+   "label": "Contrast",
+   "min": 0.5,
+   "max": 2,
+   "def": 1,
+   "group": "Light",
+   "arr": 0,
+   "comp": 2
+  },
+  {
+   "key": "highlights",
+   "label": "Highlights",
+   "min": -1,
+   "max": 1,
+   "def": 0,
+   "group": "Light",
+   "arr": 1,
+   "comp": 3
+  },
+  {
+   "key": "shadows",
+   "label": "Shadows",
+   "min": -1,
+   "max": 1,
+   "def": 0,
+   "group": "Light",
+   "arr": 2,
+   "comp": 0
+  },
+  {
+   "key": "saturation",
+   "label": "Saturation",
+   "min": -1,
+   "max": 1,
+   "def": 0,
+   "group": "Color",
+   "arr": 0,
+   "comp": 3
+  },
+  {
+   "key": "temperature",
+   "label": "Temperature",
+   "min": -1,
+   "max": 1,
+   "def": 0,
+   "group": "Color",
+   "arr": 1,
+   "comp": 0
+  },
+  {
+   "key": "tint",
+   "label": "Tint",
+   "min": -1,
+   "max": 1,
+   "def": 0,
+   "group": "Color",
+   "arr": 1,
+   "comp": 1
+  },
+  {
+   "key": "hue",
+   "label": "Hue",
+   "min": -0.5,
+   "max": 0.5,
+   "def": 0,
+   "group": "Color",
+   "arr": 1,
+   "comp": 2
+  },
+  {
+   "key": "gainR",
+   "label": "Red",
+   "min": 0,
+   "max": 2,
+   "def": 1,
+   "group": "Color",
+   "arr": 4,
+   "comp": 0
+  },
+  {
+   "key": "gainG",
+   "label": "Green",
+   "min": 0,
+   "max": 2,
+   "def": 1,
+   "group": "Color",
+   "arr": 4,
+   "comp": 1
+  },
+  {
+   "key": "gainB",
+   "label": "Blue",
+   "min": 0,
+   "max": 2,
+   "def": 1,
+   "group": "Color",
+   "arr": 4,
+   "comp": 2
+  },
+  {
+   "key": "mono",
+   "label": "Monochrome",
+   "min": 0,
+   "max": 1,
+   "def": 0,
+   "group": "Look",
+   "arr": 3,
+   "comp": 1
+  },
+  {
+   "key": "sepia",
+   "label": "Sepia",
+   "min": 0,
+   "max": 1,
+   "def": 0,
+   "group": "Look",
+   "arr": 3,
+   "comp": 2
+  },
+  {
+   "key": "vintage",
+   "label": "Vintage",
+   "min": 0,
+   "max": 1,
+   "def": 0,
+   "group": "Look",
+   "arr": 3,
+   "comp": 3
+  },
+  {
+   "key": "cinematic",
+   "label": "Cinematic grade",
+   "min": 0,
+   "max": 1,
+   "def": 0,
+   "group": "Look",
+   "arr": 5,
+   "comp": 0
+  },
+  {
+   "key": "sharpness",
+   "label": "Sharpness",
+   "min": 0,
+   "max": 2,
+   "def": 0,
+   "group": "Detail",
+   "arr": 2,
+   "comp": 1
+  },
+  {
+   "key": "blur",
+   "label": "Blur",
+   "min": 0,
+   "max": 1,
+   "def": 0,
+   "group": "Detail",
+   "arr": 2,
+   "comp": 2
+  },
+  {
+   "key": "glow",
+   "label": "Glow",
+   "min": 0,
+   "max": 1,
+   "def": 0,
+   "group": "Detail",
+   "arr": 5,
+   "comp": 3
+  },
+  {
+   "key": "vignette",
+   "label": "Vignette",
+   "min": 0,
+   "max": 1,
+   "def": 0,
+   "group": "Detail",
+   "arr": 2,
+   "comp": 3
+  },
+  {
+   "key": "grain",
+   "label": "Grain",
+   "min": 0,
+   "max": 1,
+   "def": 0,
+   "group": "Detail",
+   "arr": 3,
+   "comp": 0
+  },
+  {
+   "key": "rgbSplit",
+   "label": "RGB split",
+   "min": 0,
+   "max": 1,
+   "def": 0,
+   "group": "Detail",
+   "arr": 5,
+   "comp": 1
+  },
+  {
+   "key": "mirror",
+   "label": "Mirror",
+   "min": 0,
+   "max": 2,
+   "def": 0,
+   "group": "Detail",
+   "arr": 5,
+   "comp": 2,
+   "choices": [
+    "Off",
+    "Left half",
+    "Right half"
+   ]
+  },
+  {
+   "key": "opacity",
+   "label": "Layer strength",
+   "min": 0,
+   "max": 1,
+   "def": 1,
+   "group": "Layer",
+   "arr": 4,
+   "comp": 3
+  }
+ ],
+ "mask": [
+  {
+   "key": "maskType",
+   "label": "Region",
+   "min": 0,
+   "max": 5,
+   "def": 0,
+   "group": "Mask",
+   "arr": 6,
+   "comp": 0,
+   "choices": [
+    "Everywhere",
+    "Split line",
+    "Circle",
+    "Frame",
+    "Brush",
+    "Color"
+   ]
+  },
+  {
+   "key": "maskAngle",
+   "label": "Angle",
+   "min": -3.1416,
+   "max": 3.1416,
+   "def": 0,
+   "group": "Mask",
+   "arr": 6,
+   "comp": 1
+  },
+  {
+   "key": "maskOffset",
+   "label": "Position",
+   "min": -0.8,
+   "max": 0.8,
+   "def": 0,
+   "group": "Mask",
+   "arr": 6,
+   "comp": 2
+  },
+  {
+   "key": "maskFeather",
+   "label": "Feather",
+   "min": 0,
+   "max": 1,
+   "def": 0.1,
+   "group": "Mask",
+   "arr": 6,
+   "comp": 3
+  },
+  {
+   "key": "maskInvert",
+   "label": "Side",
+   "min": 0,
+   "max": 1,
+   "def": 0,
+   "group": "Mask",
+   "arr": 7,
+   "comp": 0,
+   "choices": [
+    "Normal",
+    "Flipped"
+   ]
+  },
+  {
+   "key": "maskCurve",
+   "label": "Curve",
+   "min": -1,
+   "max": 1,
+   "def": 0,
+   "group": "Mask",
+   "arr": 7,
+   "comp": 1
+  },
+  {
+   "key": "cx",
+   "label": "Center X",
+   "min": -0.5,
+   "max": 0.5,
+   "def": 0,
+   "group": "Mask",
+   "arr": 7,
+   "comp": 2
+  },
+  {
+   "key": "cy",
+   "label": "Center Y",
+   "min": -0.5,
+   "max": 0.5,
+   "def": 0,
+   "group": "Mask",
+   "arr": 7,
+   "comp": 3
+  },
+  {
+   "key": "radius",
+   "label": "Width",
+   "min": 0.05,
+   "max": 1,
+   "def": 0.3,
+   "group": "Mask",
+   "arr": 8,
+   "comp": 0
+  },
+  {
+   "key": "height",
+   "label": "Height",
+   "min": 0.05,
+   "max": 1,
+   "def": 0.3,
+   "group": "Mask",
+   "arr": 8,
+   "comp": 1
+  },
+  {
+   "key": "hueCenter",
+   "label": "Color to pick",
+   "min": 0,
+   "max": 1,
+   "def": 0,
+   "group": "Mask",
+   "arr": 8,
+   "comp": 2
+  },
+  {
+   "key": "hueWidth",
+   "label": "Color range",
+   "min": 0.02,
+   "max": 0.5,
+   "def": 0.12,
+   "group": "Mask",
+   "arr": 8,
+   "comp": 3
+  }
+ ]
+}
